@@ -8,6 +8,7 @@ var viewDashboard = function(){
   $('#view-portfolio').hide()
   getQuotes()
   getPortfolio()
+  getUser()
 }
 
 
@@ -32,36 +33,36 @@ var renderQuotes= function(input){
 
   initializeClock()
 // Constantly returns the minutes and seconds left until 15 minutes after the most recently created quote entry.
-  function convertTimeRemaining(){
-    var now = moment().unix()
-    var created_plus_fifteen = moment(input.created_at).add(15, "minutes").unix()
-    var t = created_plus_fifteen-now
-    var seconds = Math.floor(t % 60 );
-    var minutes = Math.floor( (t/60) % 60 );
-    var hours = Math.floor( (t/(60*60)) % 24 );
-    var days = Math.floor( t/(60*60*24) );
-    return {
-      'total': t,
-      'days': days,
-      'hours': hours,
-      'minutes': minutes,
-      'seconds': seconds
-    };
-  }
+function convertTimeRemaining(){
+  var now = moment().unix()
+  var created_plus_fifteen = moment(input.created_at).add(15, "minutes").unix()
+  var t = created_plus_fifteen-now
+  var seconds = Math.floor(t % 60 );
+  var minutes = Math.floor( (t/60) % 60 );
+  var hours = Math.floor( (t/(60*60)) % 24 );
+  var days = Math.floor( t/(60*60*24) );
+  return {
+    'total': t,
+    'days': days,
+    'hours': hours,
+    'minutes': minutes,
+    'seconds': seconds
+  };
+}
 // Displays time left, alerts user, and then initiates get request to server when -1 seconds left (1 second after 15 minutes after most recent created)
-  function initializeClock(){
-    var clock = $('#clock');
-    var timeinterval = setInterval(function(){
-      var t = convertTimeRemaining();
-      console.log(t)
-      clock.html(t.minutes + ':' + t.seconds)
-      if(t.total<=(-1)){
-        alert("Quotes need to be refreshed")
-        getQuotes()
-        clearInterval(timeinterval);
-      }
-    },1000);
-  }
+function initializeClock(){
+  var clock = $('#clock');
+  var timeinterval = setInterval(function(){
+    var t = convertTimeRemaining();
+    console.log(t)
+    clock.html(t.minutes + ':' + t.seconds)
+    if(t.total<=(-1)){
+      alert("Quotes need to be refreshed")
+      getQuotes()
+      clearInterval(timeinterval);
+    }
+  },1000);
+}
 }
 // GET PORTFOLIO/////////////////////////////
 // ==========================================
@@ -81,11 +82,7 @@ var renderPortfolio = function(data){
   for (var i = 0; i <data.length; i++) {
     $('#display-container').append(template(data[i]))
   };
-
-
-
 }
-
 
 // LOGIN RENDER AND CREATE FUNCTIONS/////////
 // ==========================================
@@ -101,6 +98,7 @@ var renderLoginForm = function(){
   var template = Handlebars.compile( source );
   var loginHtml = template()
   $('#display-container').append(loginHtml)
+
 }
 
 var createLogin = function(){
@@ -201,17 +199,28 @@ var createPosition = function (quote, price, shares){
     cost: (shares)*(price)
   }
   $.ajax({
-      url: '/position',
-      method: 'POST',
-      dataType: 'json',
-      data: trade
+    url: '/position',
+    method: 'POST',
+    dataType: 'json',
+    data: trade
   }).done(function(data){
     alert("TRADE CONFIRMED")
     viewDashboard()
   })
 }
 
+// USER METRICS////////////////////////
+// ====================================
+var getUser = function(){
+  $.get('/user').done(function(data){
 
+    console.log(data)
+
+
+
+
+  })
+}
 
 // LISTENERS///////////////////////////
 // ====================================
