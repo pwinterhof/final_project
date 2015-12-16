@@ -1,7 +1,26 @@
-.quotes {
+.trade{
+	margin-left: auto;
+	margin-right: auto;
+}
+.user{
+	display: inline-block;
+}
+.quotes{
+	height: 10%;
+}
+.name{
+	font-size: 8px;
+}
+.portfolio-position{
 	display: inline-block;
 }
 
-.portfolio-position{
-	display: inline-block;
+.row-fluid{
+  white-space: nowrap;
+}
+.row-fluid .col-lg-3{
+  display: inline-block;
+}
+#clock{
+	text-align: 90%;
 }

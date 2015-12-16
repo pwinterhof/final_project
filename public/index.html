@@ -4,134 +4,210 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/3.0.0/handlebars.min.js"></script>
 	<script type="text/javascript" src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.10.6/moment.min.js"></script>
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 	<link rel="stylesheet" type="text/css" href="style.css">
 </head>
 <body>
-<!-- ====================================== -->
-	<!-- BUTTONS -->
-
-	<button id="sign-up-btn">Sign up</button>
-	<button id="log-in-btn">Log in</button>
-	<button id="make-trade" style="display:none"> Trade</button>
-	<button id="view-portfolio" style="display:none"> View Portfolio</button>
-<!-- ====================================== -->
+	<!-- ====================================== -->
 	<!-- CONTAINERS AND TIMERS -->
-	<div id="clock" ></div>
-	<div id="quotes-container">
-	<!-- Append quotes here -->
-	<!-- timer for quotes -->
+	<nav class="navbar navbar-default navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<a class="navbar-brand" href="#">PortfolioWars</a>
+			</div>
+			<div>
+				<ul class="nav navbar-nav">
+					<li><a href="#"id="log-out-btn" style="display:none" class="btn-warning" >Log out</a></li>
+					<li><a href="#"id="sign-up-btn">Sign up</a></li> 
+					<li><a href="#" id="log-in-btn">Log in</a></li> 
+					<li><a href="#"id="make-trade" style="display:none"> Trade</a></li>
+					<li><a href="#"id="view-portfolio" style="display:none"> View Portfolio</a></li> 
+					<li><a href="#"id="view-leaders" style="display:none">View Leaderboard </a></li> 
+				</ul>
+			</div>
+		</div>
+	</nav>
+	<br/>
+	<br/>
+	<br/>
+	<div id="top-container" class="container-fluid">
+		<div id="clock" class="user"></div>
+		<div id="user-container">
+			<!-- User info: cash and positions -->
+		</div>
+	</div>
+	<div class="span11 quotes" style="overflow: auto">
+		<div class="row-fluid" id="quotes-container">
+			<!-- Horizontally scrolling container for the quotes. -->
+		</div>
+	</div>
+	<div class="span11 quotes" style="overflow: auto">
+		<div class="row-fluid" id="quotes-container-two">
+			<!-- Horizontally scrolling container for the quotes. -->
+		</div>
+	</div>
+	<br/>
+	<br/>
 
+
+	<div id="display-container">
+		
 
 	</div>
-<br/>
-<br/>
 
 
-	<div id="display-container">	
-		<!-- Append all templates here -->
-	</div>
-
-
-<!-- ========================================= -->
+	<!-- ========================================= -->
 	<!-- TEMPLATES -->
 
 	<!-- Sign Up -->
 	<script id="signup-template" type="text/x-handlebars-template">
 		<div >
-			<input placeholder="username" name = "username"/>
-			<input placeholder="password" type="password" name = "password"/>
-			<button id= "sign-up-submit"> Click to Register! </button>
-		</div>
-	</script>
+			<h3>Register a new account below!</h3>
+		</br>
+	</br>
+	<input placeholder="username" name = "username"/>
+	<input placeholder="password" type="password" name = "password"/>
+	<button id= "sign-up-submit" class="btn-primary"> Click to Register! </button>
+</div>
+</script>
 
-	<!-- Log In -->
-	<script id="login-template" type="text/x-handlebars-template">
-		<div >
-			<input placeholder="username" name = "username"/>
-			<input placeholder="password" type="password" name = "password"/>
-			<button id= "log-in-submit"> Log in </button>
-		</div>
-	</script>
+<!-- Log In -->
+<script id="login-template" type="text/x-handlebars-template">
+	<div >
+		<h3>Log in to your account</h3>
+	</br>
+</br>
+<input placeholder="username" name = "username"/>
+<input placeholder="password" type="password" name = "password"/>
+<button id= "log-in-submit" class="btn-primary"> Log in </button>
+</div>
+</script>
 
-	<!-- Quotes -->
-	<script id="quotes-template" type="text/x-handlebars-template" >
-		<div class="quotes">
-			<div>========</div>
-			<div>{{ticker}}</div>
-			<div>========</div>
-			<div>Ask: {{ask}}</div>
-			<div>Bid: {{bid}}</div>
-		</div>
-	</script>
+<!-- Quotes -->
+<script id="quotes-template" type="text/x-handlebars-template" >
+	<div class="col-lg-3">
+		<div>================</div>
+		<h4>{{ticker}}</h4>
+		<div class="name">{{name}}</div>
+		<div>================</div>
+		<div>Bid: {{bid}}</div>
+		<div>Change: {{change}}</div>
+		<div>% Change: {{percent_change}}</div>
+		<div>Ask: {{ask}}</div>
+		<div>================</div>
+	</div>
+</script>
 
-	<!-- Make a trade -->
-	<!-- inital trade based on symbol and buy/sell -->
-	<script id="quotes-trade-template" type="text/x-handlebars-template" >
-		<div class="make-trade">
-		<select id="select-ticker">
-			<option value="0">YHOO</option>
-			<option value="1">AAPL</option>
-			<option value="2">GOOG</option>
-			<option value="3">MSFT</option>
-			<option value="4">CRM</option>
-			<option value="5">CSCO</option>
-			<option value="6">ORCL</option>
-			<option value="7">PCLN</option>
-		</select>
+<!-- Make a trade -->
+<!-- inital trade based on symbol and buy/sell -->
+<script id="quotes-trade-template" type="text/x-handlebars-template" >
+	<div class="trade">
+		<select id="select-ticker"></select>
+		<button id="buy-btn" class="btn-primary">BUY</button>
+		<button id="sell-btn" class="btn-primary">SELL</button>
+	</div>
+</script>
 
-			<button id="buy-btn">BUY</button>
-			<button id="sell-btn">SELL</button>
+<script id="quotes-buy-template" type="text/x-handlebars-template" >
+	<div class="trade">
+		<div>{{ticker}}</div>
+		<div>Buy</div>
+		<div>Ask:{{ask}}</div>
+		<div><input placeholder="Shares" id="shares-buy"</div>
+		<div><button id="submit-buy" class="btn-primary">Submit</button></div>
+	</div>		
+</script>
 
+<script id="quotes-sell-template" type="text/x-handlebars-template" >
+	<div class="trade">
+		<div>{{ticker}}</div>
+		<div>Sell</div>
+		<div>Bid:{{bid}}</div>
+		<div><input placeholder="Shares" id="shares-sell"</div>
+		<div><button id="submit-sell" class="btn-primary">Submit</button></div>
+	</div>		
+</script>
 
-		</div>
-	</script>
+<script id="trade-confirm-template" type="text/x-handlebars-template" >
+	<div>
+		<div>{{ticker}}</div>
+		<div>Shares:{{share_count}}</div>
+		<div>Shares:{{total_cost}}</div>
+		<div><input placeholder="Shares" id="shares-sell"</div>
+		<div><button id="submit-sell" class="btn-primary">Submit</button></div>
+	</div>		
+</script>
 
-	<script id="quotes-buy-template" type="text/x-handlebars-template" >
-		<div>
-			<div>{{ticker}}</div>
-			<div>Buy</div>
-			<div>Ask:{{ask}}</div>
-			<div><input placeholder="Shares" id="shares-buy"</div>
-			<div><button id="submit-buy">Submit</button></div>
-		</div>		
-	</script>
-
-	<script id="quotes-sell-template" type="text/x-handlebars-template" >
-		<div>
-			<div>{{ticker}}</div>
-			<div>Sell</div>
-			<div>Bid:{{bid}}</div>
-			<div><input placeholder="Shares" id="shares-sell"</div>
-			<div><button id="submit-sell">Submit</button></div>
-		</div>		
-	</script>
-
-	<script id="trade-confirm-template" type="text/x-handlebars-template" >
-		<div>
-			<div>{{ticker}}</div>
-			<div>Shares:{{share_count}}</div>
-			<div>Shares:{{total_cost}}</div>
-			<div><input placeholder="Shares" id="shares-sell"</div>
-			<div><button id="submit-sell">Submit</button></div>
-		</div>		
-	</script>
-
-	<script id="portfolio-positions-template" type="text/x-handlebars-template">
-		<div>
-			<div>Ticker:{{ticker}}</div>
-			<div>Shares:{{shares}}</div>
-			<div>Total Cost:{{cost}}</div>
-			<div>Current Value:{{value}}</div>
-			<div>Bid:{{bid}}</div>
-			<div>Ask:{{ask}}</div>
-		</div>		
-	</script>
+<script id="portfolio-template" type="text/x-handlebars-template">
+	<div class="portfolio-container" >       
+		<table class="table table-striped" >
+			<thead>
+				<h2>Your Portfolio</h2> 
+				<tr>
+					<th>Ticker</th>
+					<th>Shares</th>
+					<th>Current Value</th>
+					<th>Total Cost</th>
+					<th>Bid</th>
+					<th>Ask</th>
+				</tr>
+			</thead>
+			<tbody id="portfolio-display-container">
+			</tbody>
+		</table>
+	</div>
+</script>
 
 
-	<!--app.js -->
-	
-	<script type="text/javascript" src="app.js"></script>
-	
+<script id="portfolio-positions-template" type="text/x-handlebars-template">
+	<tr>
+		<td>{{ticker}}</td>
+		<td>{{shares}}</td>
+		<td>{{value}}</td>
+		<td>{{cost}}</td>
+		<td>{{bid}}</td>
+		<td>{{ask}}</td>
+	</tr>	
+</script>
+
+<script id="user-performance-template" type="text/x-handlebars-template">
+	<div id="user-template" class="user">
+		<div>Cash:{{cash}}</div>
+		<div>Portfolio Value: {{net_value}}</div>
+	</div>
+</script>
+
+<script id="leaderboard-template" type="text/x-handlebars-template">
+	<div class="leaderboard-container" >       
+		<table class="table table-striped" >
+			<thead>
+				<h2>Leaderboard</h2> 
+				<tr>
+					<th>Username</th>
+					<th>CAGR</th>
+					<th>Total Return</th>
+					<th>Portfolio Value</th>
+				</tr>
+			</thead>
+			<tbody id="leaderboard-display-container">
+			</tbody>
+		</table>
+	</div>
+</script>
+
+<script id="leaderboard-positions-template" type="text/x-handlebars-template">
+	<tr>
+		<td>{{user}}</td>
+		<td>{{cagr}}</td>
+		<td>{{total_return}}</td>
+		<td>{{net_value}}</td>
+	</tr>	
+</script>
+
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/js/bootstrap.min.js"></script>
+<!--app.js -->
+<script type="text/javascript" src="app.js"></script>
+
 
 
 

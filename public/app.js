@@ -6,11 +6,10 @@ var viewDashboard = function(){
   $('#sign-up-btn').hide()
   $('#make-trade').show()
   $('#view-portfolio').hide()
+  $('#log-out-btn').show()
+  $('#view-leaders').show()
   getQuotes()
-  getPortfolio()
-  getUser()
 }
-
 
 // GET QUOTES//////////////////////////////
 // ========================================
@@ -25,28 +24,29 @@ var getQuotes = function(){
 // Renders server response to page
 var renderQuotes= function(input){
   $('#quotes-container').empty()
+  $('#quotes-container-two').empty()
   var source =$('#quotes-template').html()
   var template = Handlebars.compile(source);
-  for (var i = 0; i < input.quotes.length; i++) {
+  for (var i = 0; i < 25; i++) {
     $('#quotes-container').append(template(input.quotes[i]))
   };
-
+  for (var i = 25; i < 50; i++) {
+    $('#quotes-container-two').append(template(input.quotes[i]))
+  };
   initializeClock()
 // Constantly returns the minutes and seconds left until 15 minutes after the most recently created quote entry.
 function convertTimeRemaining(){
   var now = moment().unix()
-  var created_plus_fifteen = moment(input.created_at).add(15, "minutes").unix()
-  var t = created_plus_fifteen-now
+  var created_plus_five = moment(input.created_at).add(5, "minutes").unix()
+  var t = created_plus_five-now
   var seconds = Math.floor(t % 60 );
   var minutes = Math.floor( (t/60) % 60 );
   var hours = Math.floor( (t/(60*60)) % 24 );
   var days = Math.floor( t/(60*60*24) );
   return {
     'total': t,
-    'days': days,
-    'hours': hours,
-    'minutes': minutes,
-    'seconds': seconds
+    'minutes': ("0" + minutes).slice(-2),
+    'seconds': ("0" + seconds).slice(-2)
   };
 }
 // Displays time left, alerts user, and then initiates get request to server when -1 seconds left (1 second after 15 minutes after most recent created)
@@ -54,15 +54,17 @@ function initializeClock(){
   var clock = $('#clock');
   var timeinterval = setInterval(function(){
     var t = convertTimeRemaining();
-    console.log(t)
     clock.html(t.minutes + ':' + t.seconds)
-    if(t.total<=(-1)){
+    if(t.total<=(0)){
       alert("Quotes need to be refreshed")
-      getQuotes()
+      viewDashboard()
       clearInterval(timeinterval);
     }
   },1000);
 }
+
+getPortfolio()
+getUser()
 }
 // GET PORTFOLIO/////////////////////////////
 // ==========================================
@@ -76,11 +78,16 @@ var getPortfolio = function(){
 
 var renderPortfolio = function(data){
   $('#display-container').empty()
+  $('#view-leaders').show()
+  $('#view-portfolio').hide()
+  $('#make-trade').show()
+  var container_source = $('#portfolio-template').html()
+  var container_template =Handlebars.compile(container_source)
+  $('#display-container').append(container_template)
   var source = $('#portfolio-positions-template').html()
-  console.log(data[0].ask)
   var template = Handlebars.compile(source);
   for (var i = 0; i <data.length; i++) {
-    $('#display-container').append(template(data[i]))
+    $('#portfolio-display-container').append(template(data[i]))
   };
 }
 
@@ -92,7 +99,9 @@ var renderLoginForm = function(){
   $('#create-recipe').hide()
   $('#view-recipes').hide()
   $('#display-container').empty()
+  $('#portfolio-container').hide()
   $('#view-portfolio').hide()
+  $('#portfolio-container').hide()
   console.log("rendering")
   var source = $('#login-template').html();
   var template = Handlebars.compile( source );
@@ -114,6 +123,15 @@ var createLogin = function(){
     viewDashboard()
   })
 }
+
+var logoutUser = function() {
+  $.get('/logout').done(function(data){
+    if(data){
+      alert("Thank you for playing CAGR-Kings")
+    }
+  })
+  window.location = '/';
+};
 
 // SIGN UP RENDER AND CREATE FUNCTIONS//////////
 // =============================================
@@ -149,12 +167,19 @@ var createUser = function(){
 
 var renderTradeTemplate = function(){
   $('#view-portfolio').show()
+  $('#view-leaders').show()
+  $('#make-trade').hide()
   $('#display-container').empty()
+  $('#portfolio-container').hide()
   $.get('/quotes').done(function(data){
     console.log(data)
     var source = $('#quotes-trade-template').html()
     var template = Handlebars.compile(source)
     $('#display-container').append(template())
+    for (var i = 0; i < data.quotes.length; i++) {
+      $("#select-ticker").append("<option value='"+i+"'>"+data.quotes[i].ticker+"</option>")
+    };
+
     $('#buy-btn').on('click', function(){
       var select_index = $('#select-ticker').val()
       renderBuyTemplate(data.quotes[select_index])
@@ -169,6 +194,7 @@ var renderTradeTemplate = function(){
 var renderBuyTemplate = function(input){
   $('#view-portfolio').show()
   $('#display-container').empty()
+  $('#portfolio-container').hide()
   var source = $('#quotes-buy-template').html()
   var template = Handlebars.compile(source)
   $('#display-container').append(template(input))
@@ -182,6 +208,7 @@ var renderBuyTemplate = function(input){
 var renderSellTemplate = function(input){
   $('#view-portfolio').show()
   $('#display-container').empty()
+  $('#portfolio-container').hide()
   var source = $('#quotes-sell-template').html()
   var template = Handlebars.compile(source)
   $('#display-container').append(template(input))
@@ -212,14 +239,38 @@ var createPosition = function (quote, price, shares){
 // USER METRICS////////////////////////
 // ====================================
 var getUser = function(){
+  $('#user-container').empty()
   $.get('/user').done(function(data){
-
-    console.log(data)
-
-
-
-
+    var source = $('#user-performance-template').html()
+    var template = Handlebars.compile(source)
+    $('#user-container').append(template(data))
   })
+}
+
+// LEADERBOARD/////////////////////////
+// ====================================
+
+var getLeaders = function(){
+  $.get('/leaders').done(function(data){
+    console.log(data)
+    renderLeaders(data)
+  })
+}
+
+var renderLeaders = function(input){
+  $('#view-leaders').hide()
+  $('#view-portfolio').show()
+  $('#make-trade').show()
+  $('#display-container').empty()
+  var container_source = $('#leaderboard-template').html()
+  var container_template = Handlebars.compile(container_source)
+  $('#display-container').append(container_template)
+  var source = $('#leaderboard-positions-template').html()
+  var template = Handlebars.compile(source)
+  for (var i = 0; i <input.length; i++) {
+    console.log("appending")
+    $('#leaderboard-display-container').append(template(input[i]))
+  };
 }
 
 // LISTENERS///////////////////////////
@@ -229,6 +280,8 @@ $('#sign-up-btn').on('click', renderSignupForm);
 // log in button
 $('#log-in-btn').on('click', renderLoginForm)
 
+$('body').on('click', '#log-out-btn', logoutUser);
+
 $('body').on('click', '#sign-up-submit', createUser);
 
 $('body').on('click', '#log-in-submit', createLogin);
@@ -237,8 +290,14 @@ $('body').on('click', '#make-trade', renderTradeTemplate);
 
 $('body').on('click', '#view-portfolio', getPortfolio);
 
+$('body').on('click', '#view-leaders', getLeaders);
+
 // CHECK LOGIN COOKIE/////////////////
 // ===================================
 if(document.cookie){
   viewDashboard()
+}else{
+  console.log("sign up")
+  renderSignupForm()
 }
+
